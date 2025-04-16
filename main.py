@@ -50,6 +50,16 @@ if selection == "A":
 
     selection = input()
 
+elif selection == "A":
+    print("\nYou selected: View reviews by park")
+    print("Select a specific park")
+    print("[1] DisneyLand Paris")
+    print("[2] DisneyLand California")
+    print("[3] DisneyLand Hong Kong")
+
+    selection = input()
+
+
 elif selection == "B":
     print("\nYou selected: Visualise Data")
     print("\nEnter one of the following options:")
@@ -67,6 +77,5 @@ else:
     print("\nInvalid choice. Please enter the letter which corresponds with your desired menu choice: \n[A]. View Data"
     "\n[B]. Visualise Data"
     "\n[X]. Exit")
-
 
 
