@@ -38,7 +38,7 @@ print("[B]. Visualise Data")
 print("[X]. Exit")
 
 # Taking user input
-selection = input("Please enter your choice (A-X): ")
+selection = input("\nPlease enter your choice (A-X): ")
 
 if selection == "A":
     print("\nYou selected: View Data")
@@ -48,6 +48,8 @@ if selection == "A":
     print("[C] Average score per year by park")
     print("[D] Average score per park by reviewer location")
 
+    selection = input()
+
 elif selection == "B":
     print("\nYou selected: Visualise Data")
     print("\nEnter one of the following options:")
@@ -55,6 +57,8 @@ elif selection == "B":
     print("[B] Average scores")
     print("[C] Park Ranking by nationality")
     print("[D] Most popular month by park")
+
+    selection = input()
 
 elif selection == "X":
     print("You selected: Exit\nGoodbye!")
