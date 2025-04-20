@@ -1,81 +1,96 @@
-"""
-This module is responsible for the overall program flow. It controls how the user interacts with the
-program and how the program behaves. It uses the other modules to interact with the user, carry out
-processing, and for visualising information.
-
-Note:   any user input/output should be done in the module 'tui'
-        any processing should be done in the module 'process'
-        any visualisation should be done in the module 'visual'
-"""
-#Section A#
-
-print("--------------------------\nDisneyLand Review Analyser\n--------------------------")
-
-import csv
-
-# Replace 'your_file.csv' with the path to your actual CSV file
-filename = 'data/disneyland_reviews.csv'
-data = []
-try:
-    with open(filename, newline='', encoding='utf-8') as csvfile:
-        reader = csv.reader(csvfile)
-        for row in reader:
-            data.append(row)
-
-    print("\nFinished reading the dataset.")
-    print(f"Total number of rows: {len(data)}")
-
-except FileNotFoundError:
-    print(f"Error: File '{filename}' not found.")
-except Exception as e:
-    print(f"An error occurred: {e}")
+# main.py
+import tui
+import process
+import visual
+import exporter
 
 
-# Displaying a simple menu
-print("\n--- Main Menu ---")
-print("[A]. View Data")
-print("[B]. Visualise Data")
-print("[X]. Exit")
+def main():
+    # Display welcome message
+    tui.display_welcome()
 
-# Taking user input
-selection = input("\nPlease enter your choice (A-X): ")
+    # Read CSV data
+    data = process.read_csv("Disneyland_reviews.csv")
+    tui.confirm_data_loaded(len(data))
 
-if selection == "A":
-    print("\nYou selected: View Data")
-    print("\nPlease enter one of the following options:")
-    print("[A] View reviews by park")
-    print("[B] Number of reviews by park abd reviewer location")
-    print("[C] Average score per year by park")
-    print("[D] Average score per park by reviewer location")
+    while True:
+        # Display main menu and get user choice
+        choice = tui.display_main_menu()
+        tui.confirm_choice(choice)
 
-    selection = input()
-
-elif selection == "A":
-    print("\nYou selected: View reviews by park")
-    print("Select a specific park")
-    print("[1] DisneyLand Paris")
-    print("[2] DisneyLand California")
-    print("[3] DisneyLand Hong Kong")
-
-    selection = input()
+        if choice == 'X':
+            tui.display_exit()
+            break
+        elif choice == 'A':
+            handle_view_data(data)
+        elif choice == 'B':
+            handle_visualise_data(data)
+        else:
+            tui.display_invalid_choice()
 
 
-elif selection == "B":
-    print("\nYou selected: Visualise Data")
-    print("\nEnter one of the following options:")
-    print("[A] Most reviewed park")
-    print("[B] Average scores")
-    print("[C] Park Ranking by nationality")
-    print("[D] Most popular month by park")
+def handle_view_data(data):
+    """Handle the View Data submenu (Option A)."""
+    while True:
+        choice = tui.display_view_data_submenu()
+        tui.confirm_choice(choice)
 
-    selection = input()
+        if choice == 'X':
+            break
+        elif choice == '1':
+            park = tui.get_park_input()
+            reviews = process.get_reviews_by_park(data, park)
+            tui.display_reviews(reviews, park)
+        elif choice == '2':
+            park = tui.get_park_input()
+            location = tui.get_location_input()
+            count = process.get_review_count_by_location(data, park, location)
+            tui.display_review_count(count, park, location)
+        elif choice == '3':
+            park = tui.get_park_input()
+            year = tui.get_year_input()
+            avg_rating = process.get_average_rating_by_year(data, park, year)
+            tui.display_average_rating(avg_rating, park, year)
+        elif choice == '4':
+            park_ratings = process.get_average_rating_by_location(data)
+            tui.display_average_rating_by_location(park_ratings)
+        else:
+            tui.display_invalid_choice()
 
-elif selection == "X":
-    print("You selected: Exit\nGoodbye!")
 
-else:
-    print("\nInvalid choice. Please enter the letter which corresponds with your desired menu choice: \n[A]. View Data"
-    "\n[B]. Visualise Data"
-    "\n[X]. Exit")
+def handle_visualizations(data):
+    """Handle the Visualizations submenu (Option B)."""
+    while True:
+        choice = tui.display_visualizations_submenu()
+        tui.confirm_choice(choice)
+
+        if choice == 'X':
+            break
+        elif choice == '1':
+            counts = process.get_review_counts_by_park(data)
+            visual.plot_pie_chart(counts, "Number of Reviews by Park")
+        elif choice == '2':
+            avg_ratings = process.get_average_rating_by_park(data)
+            visual.plot_bar_chart(avg_ratings, "Average Rating by Park", "Park", "Average Rating")
+        elif choice == '3':
+            park = tui.get_park_input()
+            top_locations = process.get_top_locations_by_rating(data, park)
+            visual.plot_bar_chart(top_locations, f"Top 10 Locations for {park}", "Location", "Average Rating")
+        elif choice == '4':
+            park = tui.get_park_input()
+            monthly_ratings = process.get_monthly_ratings(data, park)
+            visual.plot_bar_chart(monthly_ratings, f"Average Rating by Month for {park}", "Month", "Average Rating")
+        else:
+            tui.display_invalid_choice()
 
 
+def handle_export(data):
+    """Handle the Export Data feature (Option C)."""
+    format_choice = tui.get_export_format()
+    exporter_obj = exporter.DataExporter(data)
+    exporter_obj.export_data(format_choice)
+    tui.confirm_export(format_choice)
+
+
+if __name__ == "__main__":
+    main()
